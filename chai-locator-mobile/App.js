@@ -33,10 +33,12 @@ const App = () => {
   }, []);
 
   const fetchChaiSpots = async (lat, lng) => {
+    console.log("lat", lat, "lng", lng);
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_BASE_URL}/nearby-chai-spots?lat=${lat}&lng=${lng}`
+        `http://192.168.1.12:5000/nearby-chai-spots?lat=${lat}&lng=${lng}`
       );
+      console.log("data", response.data);
       setChaiSpots(response.data);
     } catch (error) {
       console.error(error);
@@ -76,6 +78,7 @@ const App = () => {
       </MapView>
 
       <FlatList
+        style={styles.flatList}
         data={chaiSpots}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
@@ -84,7 +87,11 @@ const App = () => {
             style={styles.listItem}
           >
             <Text style={styles.spotName}>{item.name}</Text>
-            <Text>Rating: {item.rating || "N/A"}</Text>
+            <Text>
+              {item.rating
+                ? "Waah " + parseInt(item.rating) + " Rated!"
+                : "N/A"}
+            </Text>
             <Text>Parking: {item.parking ? "Yes" : "No"}</Text>
           </TouchableOpacity>
         )}
@@ -101,7 +108,11 @@ const App = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.spotName}>{selectedSpot?.name}</Text>
-            <Text>Rating: {selectedSpot?.rating || "N/A"}</Text>
+            <Text>
+              {selectedSpot?.rating
+                ? parseInt(selectedSpot?.rating) + "Waaah"
+                : "N/A"}
+            </Text>
             <Text>Parking: {selectedSpot?.parking ? "Yes" : "No"}</Text>
             <TouchableOpacity
               onPress={() => setSelectedSpot(null)}
@@ -118,9 +129,14 @@ const App = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  map: { flex: 1 },
+  map: { flex: 1, height: "50%" },
   loader: { flex: 1, justifyContent: "center", alignItems: "center" },
-  listItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: "#ddd" },
+  flatList: { maxHeight: "50%" },
+  listItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
   spotName: { fontSize: 16, fontWeight: "bold" },
   refreshButton: {
     position: "absolute",

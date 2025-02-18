@@ -76,6 +76,7 @@ app.delete("/chai-spots/:id", async (req, res) => {
 app.get("/nearby-chai-spots", async (req, res) => {
   try {
     const { lat, lng } = req.query;
+    console.log("nearby-chai-spots", lat, lng);
     const response = await axios.get(
       `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=chai&key=${process.env.GOOGLE_MAPS_API_KEY}`
     );
