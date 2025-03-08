@@ -4,4 +4,3 @@ chai-locator-web/node_modules
 chai-locator-backend/.env
 chai-locator-mobile/.env
 chai-locator-web/.env
-**/.env
