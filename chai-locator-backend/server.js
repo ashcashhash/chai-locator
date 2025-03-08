@@ -77,10 +77,30 @@ app.get("/nearby-chai-spots", async (req, res) => {
   try {
     const { lat, lng } = req.query;
     console.log("nearby-chai-spots", lat, lng);
+    // const response = await axios.get(
+    //   `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=chai&rankby=prominence&key=${process.env.GOOGLE_MAPS_API_KEY}`
+    // );
+    // res.json(response.data.results);
+
+    //
+
     const response = await axios.get(
-      `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&keyword=chai&key=${process.env.GOOGLE_MAPS_API_KEY}`
+      `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=2000&type=cafe&rankby=prominence&keyword=chai&key=${process.env.GOOGLE_MAPS_API_KEY}`
     );
-    res.json(response.data.results);
+
+    const chaiSpots = response.data.results.map((spot) => ({
+      ...spot,
+      name: spot.name,
+      rating: spot.rating || 0,
+      parking: spot.user_ratings_total > 10, // Simple heuristic
+      photo: spot.photos
+        ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${spot.photos[0].photo_reference}&key=${process.env.GOOGLE_MAPS_API_KEY}`
+        : "https://via.placeholder.com/100", // Fallback image
+    }));
+
+    chaiSpots.sort((a, b) => b.rating - a.rating);
+
+    res.json(chaiSpots);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
